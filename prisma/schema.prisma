@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  FREELANCE
+  INTERNSHIP
+}
+
+enum WorkMode {
+  ONSITE
+  REMOTE
+  HYBRID
+}
+
+enum Status {
+  ACTIVE
+  PAUSED
+  CLOSED
+}
+
+model User {
+  id               String             @id @default(uuid())
+  name             String
+  password         String
+  email            String             @unique
+  roles            String[]
+  jobAdvertisement JobAdvertisement[]
+  Application      Application[]
+  Company          Company[]
+}
+
+model Company {
+  id               String             @id @default(uuid())
+  name             String             @unique
+  description      String
+  logoUrl          String 
+  phone            String?
+  address          String?
+  industry         String
+  isVerified       Boolean
+  socialLinks      String[]
+  website          String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  User             User               @relation(fields: [userId], references: [id])
+  userId           String
+  JobAdvertisement JobAdvertisement[]
+}
+
+model JobAdvertisement {
+  id                    String                      @id @default(uuid())
+  title                 String
+  description           String
+  experienceLevel       String
+  jobType               JobType
+  workMode              WorkMode
+  publishType           TypePublishJobAdvertisement
+  applicationLinks      String[]
+  requirements          String[]
+  benefits              String[]
+  languagesRequired     String[]
+  status                Status                      @default(ACTIVE)
+  vacancies             Int                         @default(1)
+  applicationDeadline   DateTime?
+  salay                 Float?
+  location              String?
+  workHours             String?
+  additionalInformation String?
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime                    @updatedAt
+
+  userId String? // Relación con usuario, si aplica
+  User   User?   @relation(fields: [userId], references: [id])
+
+  companyId   String? // Relación con compañía, si aplica
+  Company     Company?      @relation(fields: [companyId], references: [id])
+  Category    Category      @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  Application Application[]
+}
+
+model Category {
+  id               String             @id @default(uuid())
+  name             String             @unique
+  jobAdvertisement JobAdvertisement[]
+}
+
+model Application {
+  id          String            @id @default(uuid())
+  userId      String
+  jobId       String
+  status      ApplicationStatus @default(PENDING) // Estado de la postulación
+  coverLetter String? // Carta de presentación opcional
+  resumeLink  String? // Enlace al CV o archivo
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  User             User             @relation(fields: [userId], references: [id])
+  JobAdvertisement JobAdvertisement @relation(fields: [jobId], references: [id])
+}
+
+enum ApplicationStatus {
+  PENDING // Postulación recibida pero no revisada
+  REVIEWED // Postulación revisada
+  SHORTLISTED // Seleccionado para la siguiente etapa
+  REJECTED // Postulación rechazada
+  ACCEPTED // Aprobado para el puesto
+}
+
+enum TypePublishJobAdvertisement {
+  USER
+  COMPANY
+}
+
