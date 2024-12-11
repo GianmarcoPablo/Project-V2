@@ -11,13 +11,16 @@ export class AuthReposioryImpl implements AuthRepository {
             const user = await prisma.user.findUnique({
                 where: { email }
             });
-            return user ? new User(
+
+            if (!user) return null
+
+            return new User(
                 user.id,
                 user.email,
                 user.name,
                 user.password,
                 user.roles
-            ) : null;
+            );
         } catch (error) {
             console.error("Error login user:", error);
             throw error; // Lanzar el error para que no se devuelva undefined

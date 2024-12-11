@@ -20,7 +20,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
     async execute(body: RegisterUserDto): Promise<string> {
         const existingUser = await this.userRepository.findByEmail(body.email);
         if (existingUser) throw new Error("User already exits")
-        await this.passwordService.hash(body.password);
+        body.password = await this.passwordService.hash(body.password);
         const newUser = await this.userRepository.registerUser(body)
         // TODO: SEND EMAIL
         return await this.tokenService.generateToken({ id: newUser.id })

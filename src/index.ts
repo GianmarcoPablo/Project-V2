@@ -1,17 +1,19 @@
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
+import { serveStatic } from 'hono/bun'
 import { AuthRoutes } from './presentation/routes/auth/auth.routes';
 import { AuthReposioryImpl } from './infrastructure/repositories/auth/auth.repository.impl';
 import { HashPasswordService } from './infrastructure/providers/auth/hash-password.service';
 import { TokenService } from './infrastructure/providers/auth/token.service';
 import { CompanyRoutes } from './presentation/routes/company/company.routes';
 import { CompanyRepositoryImpl } from './infrastructure/repositories/company/company.repository.impl';
+import { StorageService } from './infrastructure/providers/storage/storage.service';
+import { AdvertisementJobRoutes } from './presentation/routes/advertisement-job/advertisement-job.routes';
+import { AdvertisementJobRepositoryImpl } from './infrastructure/repositories/advertisement-job/advertisement-job.repository.impl';
 
 const app = new Hono()
 
-// Use the logger middleware to log requests
-app.use(logger());
 
 // Cors
 app.use(
@@ -22,12 +24,19 @@ app.use(
   })
 )
 
+// Use the logger middleware to log requests
+app.use(logger());
+
+// Static files
+app.use("/static/*", serveStatic({ root: "./" }))
+
 // Home Route
 app.get("/", (c) => c.text("Hono! with Bun"));
 
 // Routes
 app.route("/api/v1/auth", new AuthRoutes(new AuthReposioryImpl(), new HashPasswordService(), new TokenService()).routes)
-app.route("/api/v1/company", new CompanyRoutes(new CompanyRepositoryImpl()).routes)
+app.route("/api/v1/company", new CompanyRoutes(new CompanyRepositoryImpl(), new StorageService()).routes)
+app.route("/api/v1/advertisement", new AdvertisementJobRoutes(new AdvertisementJobRepositoryImpl()).routes)
 
 // Routes - Not found
 app.notFound((c) => {

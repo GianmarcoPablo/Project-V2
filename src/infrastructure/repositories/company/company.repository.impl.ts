@@ -1,11 +1,11 @@
-import { CreateCompanyDto } from "../../../domain/dtos/company/create-company.dto";
+import { CreateCompanyDto, CreateCompanyPrismaDto } from "../../../domain/dtos/company/create-company.dto";
 import { Company } from "../../../domain/entities/company/Company";
 import { CompanyRepository } from "../../../domain/repositories/company/company.repository";
 import { prisma } from "../../orm/prisma";
 
 export class CompanyRepositoryImpl implements CompanyRepository {
 
-    async createCompany(body: CreateCompanyDto): Promise<Company> {
+    async createCompany(body: CreateCompanyPrismaDto): Promise<Company> {
         try {
             const company = await prisma.company.create({ data: body })
             return new Company(

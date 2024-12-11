@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { v2 as cloudinary, UploadApiErrorResponse, UploadApiResponse } from "cloudinary"
 import { IStorageService } from "../../../domain/providers-interfaces/storage/storage.service.interface";
 
@@ -12,7 +13,7 @@ export const config = {
 
 export type CloudinaryResponse = UploadApiResponse | UploadApiErrorResponse;
 
-export class StorageService implements IStorageService{
+export class StorageService implements IStorageService {
     constructor() {
         cloudinary.config({
             cloud_name: config.cloudinary.cloud_name,
@@ -22,7 +23,12 @@ export class StorageService implements IStorageService{
     }
 
     async uploadFile(file: string, folder: string): Promise<CloudinaryResponse> {
-        const uploadStream = await cloudinary.uploader.upload(file, { folder: folder })
-        return uploadStream
+        try {
+            const uploadStream = await cloudinary.uploader.upload(file, { folder: folder })
+            return uploadStream
+        } catch (error) {
+            console.log({ error })
+            throw error
+        }
     }
 }
