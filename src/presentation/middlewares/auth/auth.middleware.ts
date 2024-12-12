@@ -23,6 +23,7 @@ export class AuthMiddleware {
             console.log(token)
             if (!token) return c.json({ msg: "Unauthorized" }, 401)
             const { header, payload } = decode(token)
+            if (!payload.id) return c.json({ msg: "Unauthorized" }, 401)
             const sub = payload.id as string
             if (!sub) return c.json({ msg: "Unauthorized" }, 401)
             const user = await prisma.user.findUnique({ where: { id: sub } })
@@ -30,7 +31,7 @@ export class AuthMiddleware {
             c.req.user = user
             await next()
         } catch (error) {
-            return c.json({ message: "Internal server error probando" }, 500);
+            throw error
         }
     }
 }

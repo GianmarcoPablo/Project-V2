@@ -11,6 +11,8 @@ import { CompanyRepositoryImpl } from './infrastructure/repositories/company/com
 import { StorageService } from './infrastructure/providers/storage/storage.service';
 import { AdvertisementJobRoutes } from './presentation/routes/advertisement-job/advertisement-job.routes';
 import { AdvertisementJobRepositoryImpl } from './infrastructure/repositories/advertisement-job/advertisement-job.repository.impl';
+import { CategoryRepositoryImpl } from './infrastructure/repositories/category/category.repository.impl';
+import { CategoryRoutes } from './presentation/routes/category/category.routes';
 
 const app = new Hono()
 
@@ -34,9 +36,24 @@ app.use("/static/*", serveStatic({ root: "./" }))
 app.get("/", (c) => c.text("Hono! with Bun"));
 
 // Routes
-app.route("/api/v1/auth", new AuthRoutes(new AuthReposioryImpl(), new HashPasswordService(), new TokenService()).routes)
-app.route("/api/v1/company", new CompanyRoutes(new CompanyRepositoryImpl(), new StorageService()).routes)
-app.route("/api/v1/advertisement", new AdvertisementJobRoutes(new AdvertisementJobRepositoryImpl()).routes)
+app.route("/api/v1/auth", new AuthRoutes(
+  new AuthReposioryImpl(),
+  new HashPasswordService(),
+  new TokenService()).routes
+)
+app.route("/api/v1/company", new CompanyRoutes(
+  new CompanyRepositoryImpl(),
+  new StorageService()).routes
+)
+app.route("/api/v1/advertisement", new AdvertisementJobRoutes(
+  new AdvertisementJobRepositoryImpl(),
+  new CategoryRepositoryImpl(),
+  new AuthReposioryImpl(),
+  new CompanyRepositoryImpl()).routes
+)
+app.route("/api/v1/category", new CategoryRoutes(
+  new CategoryRepositoryImpl()).routes
+)
 
 // Routes - Not found
 app.notFound((c) => {

@@ -3,10 +3,10 @@ import { zRegisterUserValidator } from "../../validators/auth/register-user.vali
 import { zLoginUserSchema } from "../../validators/auth/login-user.validator";
 import { RegisterUserUseCase } from "../../../domain/use-cases/auth/register-user.use-case";
 import { AuthRepository } from "../../../domain/repositories/auth/auth.repository";
-import { BlankEnv, BlankSchema } from "hono/types";
 import { IHashPasswordService } from "../../../domain/providers-interfaces/auth/hash-password.service.interface";
 import { ITokenService } from "../../../domain/providers-interfaces/auth/token.service.interface";
 import { LoginUserUseCase } from "../../../domain/use-cases/auth/login-user.use-case";
+import { AuthMiddleware } from "../../middlewares/auth/auth.middleware";
 
 
 export class AuthRoutes {
@@ -17,7 +17,7 @@ export class AuthRoutes {
         private readonly tokenService: ITokenService
     ) { }
 
-    public get routes(): Hono<BlankEnv, BlankSchema, "/"> {
+    public get routes() {
         const router = new Hono();
 
         router.post("/register", zRegisterUserValidator, async (c) => {
@@ -31,6 +31,11 @@ export class AuthRoutes {
             const data = await new LoginUserUseCase(this.authRepository, this.passwordService, this.tokenService).execute(body)
             return c.json(data);
         });
+
+        router.get("/user", AuthMiddleware.authenticate, async (c) => {
+            const user = c.req.user
+            return c.json(user)
+        })
 
         return router;
     }

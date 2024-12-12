@@ -5,7 +5,7 @@ import { prisma } from "../../orm/prisma";
 
 export class CategoryRepositoryImpl implements CategoryRepository {
 
-    async createCategory(body: CreateCategoryDto): Promise<Category> {
+    async create(body: CreateCategoryDto): Promise<Category> {
         try {
             const category = await prisma.category.create({ data: body })
             return new Category(category.id, category.name)
@@ -15,7 +15,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
         }
     }
 
-    async findCategoryById(categoryId: string): Promise<Category | null> {
+    async findById(categoryId: string): Promise<Category | null> {
         try {
             const category = await prisma.category.findUnique({ where: { id: categoryId } })
             if (!category) return null; // Retorna null si no existe la categoría

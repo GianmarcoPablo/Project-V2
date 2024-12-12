@@ -16,12 +16,12 @@ export class CreateCompanyUseCase implements ICreateCompanyUseCase {
     ) { }
 
     async execute(body: CreateCompanyDto): Promise<Company> {
-        const logo = body.logoUrl as File;
+        const logo = body.logoUrl;
         const mimeType = logo.type; // Obtiene el tipo MIME, como "image/png" o "image/jpeg"
         const byteArrayBuffer = await logo.arrayBuffer();
         const base64 = encodeBase64(byteArrayBuffer);
         const storage = await this.storageService.uploadFile(`data:${mimeType};base64,${base64}`, "companyLogo");
-        const company = await this.companyRepository.createCompany({ ...body, logoUrl: storage.url });
+        const company = await this.companyRepository.create({ ...body, logoUrl: storage.url });
         return company
     }
 }

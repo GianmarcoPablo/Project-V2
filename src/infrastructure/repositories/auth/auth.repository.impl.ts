@@ -38,4 +38,15 @@ export class AuthReposioryImpl implements AuthRepository {
         }
     }
 
+
+    async findById(id: string): Promise<User | null> {
+        try {
+            const user = await prisma.user.findUnique({ where: { id } })
+            if (!user) return null
+            return new User(user.id, user.email, user.name, user.password, user.roles)
+        } catch (error) {
+            console.error("User not found:", error);
+            throw error; // Lanzar el error para que no se devuelva undefined
+        }
+    }
 }

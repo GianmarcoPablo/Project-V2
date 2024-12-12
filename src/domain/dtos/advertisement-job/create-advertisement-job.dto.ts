@@ -6,7 +6,7 @@ export interface CreateJobAdvertisementDto {
     experienceLevel: string;
     jobType: $Enums.JobType; // Enum generado por Prisma
     workMode: $Enums.WorkMode; // Enum generado por Prisma
-    publishType: $Enums.TypePublishJobAdvertisement; // Enum generado por Prisma
+    publishType: any; // Enum generado por Prisma
     applicationLinks: string[];
     requirements: string[];
     benefits: string[];
