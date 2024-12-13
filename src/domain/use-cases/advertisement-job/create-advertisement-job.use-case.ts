@@ -29,7 +29,7 @@ export class CreateAdvertisementJobUseCase implements ICreateAdvertisementJobUse
         if (body.userId && !user) throw (`User ${body.userId}`);
         if (body.companyId && !company) throw (`Company ${body.companyId}`);
 
-        const advertisement = await this.advertisementJobRepository.createAdvertisementJob(body)
+        const advertisement = await this.advertisementJobRepository.create(body)
         return advertisement
     }
 }

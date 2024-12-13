@@ -5,7 +5,7 @@ interface IGetAllCompaniesUseCase {
     execute(body: any): Promise<Company[]>
 }
 
-export class GetAllUseCase implements IGetAllCompaniesUseCase {
+export class GetAllCompaniesUseCase implements IGetAllCompaniesUseCase {
 
     constructor(
         private readonly companyRepository: CompanyRepository,

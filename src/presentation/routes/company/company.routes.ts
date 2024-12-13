@@ -6,7 +6,8 @@ import { CreateCompanyUseCase } from "../../../domain/use-cases/company/create-c
 import { UpdateCompanyUseCase } from "../../../domain/use-cases/company/update-company.use-case";
 import { zUpdateCompanySchema } from "../../validators/company/update-company.validator";
 import { zCreateCompanySchema } from "../../validators/company/create-company.validator";
-import { GetAllUseCase } from "../../../domain/use-cases/company/get-all-companies.use-case";
+import { GetAllCompaniesUseCase } from "../../../domain/use-cases/company/get-all-companies.use-case";
+import { GetCompanyByIdUseCase } from "../../../domain/use-cases/company/get-company-by-id.use-case";
 
 export class CompanyRoutes {
 
@@ -19,7 +20,13 @@ export class CompanyRoutes {
         const router = new Hono();
 
         router.get("/", async (c) => {
-            const data = await new GetAllUseCase(this.companyRepository).execute({})
+            const data = await new GetAllCompaniesUseCase(this.companyRepository).execute({})
+            return c.json(data)
+        })
+
+        router.get("/:id", async (c) => {
+            const id = c.req.param("id");
+            const data = await new GetCompanyByIdUseCase(this.companyRepository).execute(id)
             return c.json(data)
         })
 
