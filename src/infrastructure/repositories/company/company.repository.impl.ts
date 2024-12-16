@@ -32,7 +32,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
         }
     }
 
-    async findById(id: string): Promise<Company | null> {
+    async getById(id: string): Promise<Company | null> {
         try {
             const company = await prisma.company.findUnique({ where: { id } })
             if (!company) return null

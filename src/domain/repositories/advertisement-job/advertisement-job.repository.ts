@@ -5,5 +5,6 @@ import { AdvertisementJob } from "../../entities/advertisement-job/Advertisement
 export abstract class AdvertisementJobRepository {
     abstract create(body: CreateJobAdvertisementDto): Promise<AdvertisementJob>
     abstract getAll(body: any): Promise<AdvertisementJob[]>
+    abstract getById(id: string): Promise<AdvertisementJob | null>
     abstract update(id: string, body: UpdateJobAdvertisementDto): Promise<AdvertisementJob>
 }

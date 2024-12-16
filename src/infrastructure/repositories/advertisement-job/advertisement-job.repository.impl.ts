@@ -77,6 +77,41 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
         }
     }
 
+    async getById(id: string): Promise<AdvertisementJob | null> {
+        try {
+            const advertisement = await prisma.jobAdvertisement.findUnique({ where: { id } })
+            if (!advertisement) return null
+            return new AdvertisementJob(
+                advertisement.id,
+                advertisement.title,
+                advertisement.description,
+                advertisement.experienceLevel,
+                advertisement.jobType,
+                advertisement.workMode,
+                advertisement.publishType,
+                advertisement.applicationLinks,
+                advertisement.requirements,
+                advertisement.benefits,
+                advertisement.languagesRequired,
+                advertisement.status,
+                advertisement.vacancies,
+                advertisement.createdAt,
+                advertisement.updatedAt,
+                advertisement.categoryId,
+                advertisement.applicationDeadline ? advertisement.applicationDeadline : undefined,
+                advertisement.salay ? advertisement.salay : undefined,
+                advertisement.location ? advertisement.location : undefined,
+                advertisement.workHours ? advertisement.workHours : undefined,
+                advertisement.additionalInformation ? advertisement.additionalInformation : undefined,
+                advertisement.userId ? advertisement.userId : undefined,
+                advertisement.companyId ? advertisement.companyId : undefined,
+            )
+        } catch (error) {
+            console.error("Error get  advertismenet:", error);
+            throw error; // Lanzar el error para que no se devuelva undefined
+        }
+    }
+
     async update(id: string, body: UpdateJobAdvertisementDto): Promise<AdvertisementJob> {
         try {
             const advertisement = await prisma.jobAdvertisement.update({ where: { id }, data: body })

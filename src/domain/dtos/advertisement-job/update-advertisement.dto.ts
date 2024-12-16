@@ -20,5 +20,5 @@ export interface UpdateJobAdvertisementDto {
     additionalInformation?: string;
     userId?: string;
     companyId?: string;
-    categoryId: string;
+    categoryId?: string;
 }

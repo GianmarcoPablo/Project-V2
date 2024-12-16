@@ -12,7 +12,7 @@ export class GetCompanyByIdUseCase implements IGetCompanyByIdUseCase {
     ) { }
 
     async execute(id: string): Promise<Company> {
-        const company = await this.companyRepository.findById(id)
+        const company = await this.companyRepository.getById(id)
         if (!company) throw "company not found"
         return company
     }
