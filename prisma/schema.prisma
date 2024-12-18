@@ -47,11 +47,12 @@ model Company {
   id               String             @id @default(uuid())
   name             String             @unique
   description      String
-  logoUrl          String 
+  logoUrl          String?
+  banerUrl         String?
   phone            String?
   address          String?
   industry         String
-  isVerified       Boolean
+  isVerified       Boolean            @default(false)
   socialLinks      String[]
   website          String?
   createdAt        DateTime           @default(now())
@@ -125,4 +126,3 @@ enum TypePublishJobAdvertisement {
   USER
   COMPANY
 }
-

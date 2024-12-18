@@ -16,12 +16,31 @@ export class CreateCompanyUseCase implements ICreateCompanyUseCase {
     ) { }
 
     async execute(body: CreateCompanyDto): Promise<Company> {
-        const logo = body.logoUrl;
-        const mimeType = logo.type; // Obtiene el tipo MIME, como "image/png" o "image/jpeg"
-        const byteArrayBuffer = await logo.arrayBuffer();
-        const base64 = encodeBase64(byteArrayBuffer);
-        const storage = await this.storageService.uploadFile(`data:${mimeType};base64,${base64}`, "companyLogo");
-        const company = await this.companyRepository.create({ ...body, logoUrl: storage.url });
-        return company
+        const logoUrl = await this.processFile(body.logoUrl, "companyLogo");
+        const bannerUrl = await this.processFile(body.bannerUrl, "companyBanner");
+
+        const companyData = {
+            ...body,
+            logoUrl: logoUrl || null,
+            bannerUrl: bannerUrl || null,
+        };
+
+        const company = await this.companyRepository.create(companyData);
+        return company;
+    }
+
+    private async processFile(file: File | undefined, folder: string): Promise<string | null> {
+        if (!file) return null;
+
+        const mimeType = file.type; // Obtiene el tipo MIME
+        const byteArrayBuffer = await file.arrayBuffer(); // Convierte el archivo a un buffer
+        const base64 = encodeBase64(byteArrayBuffer); // Codifica en Base64
+
+        // Sube el archivo al almacenamiento y devuelve la URL
+        const uploadedFile = await this.storageService.uploadFile(
+            `data:${mimeType};base64,${base64}`,
+            folder
+        );
+        return uploadedFile.url;
     }
 }
