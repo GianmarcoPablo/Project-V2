@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -33,14 +27,16 @@ enum Status {
 }
 
 model User {
-  id               String             @id @default(uuid())
-  name             String
-  password         String
-  email            String             @unique
-  roles            String[]
-  jobAdvertisement JobAdvertisement[]
-  Application      Application[]
-  Company          Company[]
+  id                     String                   @id @default(uuid())
+  name                   String
+  password               String
+  email                  String                   @unique
+  roles                  String[]
+  jobAdvertisement       JobAdvertisement[]
+  Application            Application[]
+  Company                Company[]
+  SavedAdvertisementJob  SavedAdvertisementJob[]
+  ReportAdvertisementJob ReportAdvertisementJob[]
 }
 
 model Company {
@@ -48,7 +44,7 @@ model Company {
   name             String             @unique
   description      String
   logoUrl          String?
-  bannerUrl         String?
+  bannerUrl        String?
   phone            String?
   address          String?
   industry         String
@@ -87,11 +83,13 @@ model JobAdvertisement {
   userId String? // Relación con usuario, si aplica
   User   User?   @relation(fields: [userId], references: [id])
 
-  companyId   String? // Relación con compañía, si aplica
-  Company     Company?      @relation(fields: [companyId], references: [id])
-  Category    Category      @relation(fields: [categoryId], references: [id])
-  categoryId  String
-  Application Application[]
+  companyId              String? // Relación con compañía, si aplica
+  Company                Company?                 @relation(fields: [companyId], references: [id])
+  Category               Category                 @relation(fields: [categoryId], references: [id])
+  categoryId             String
+  Application            Application[]
+  SavedAdvertisementJob  SavedAdvertisementJob[]
+  ReportAdvertisementJob ReportAdvertisementJob[]
 }
 
 model Category {
@@ -114,12 +112,45 @@ model Application {
   JobAdvertisement JobAdvertisement @relation(fields: [jobId], references: [id])
 }
 
+model SavedAdvertisementJob {
+  id      String   @id @default(uuid())
+  userId  String
+  jobId   String
+  savedAt DateTime @default(now())
+
+  User             User             @relation(fields: [userId], references: [id])
+  JobAdvertisement JobAdvertisement @relation(fields: [jobId], references: [id])
+
+  @@unique([userId, jobId]) // Asegura que un usuario no pueda guardar el mismo aviso más de una vez.
+}
+
+model ReportAdvertisementJob {
+  id          String       @id @default(uuid())
+  userId      String
+  jobId       String
+  reason      String // Motivo del reporte
+  description String? // Descripción adicional opcional
+  status      ReportStatus @default(PENDING) // Estado del reporte
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  User             User             @relation(fields: [userId], references: [id])
+  JobAdvertisement JobAdvertisement @relation(fields: [jobId], references: [id])
+}
+
 enum ApplicationStatus {
   PENDING // Postulación recibida pero no revisada
   REVIEWED // Postulación revisada
   SHORTLISTED // Seleccionado para la siguiente etapa
   REJECTED // Postulación rechazada
   ACCEPTED // Aprobado para el puesto
+}
+
+enum ReportStatus {
+  PENDING // Reporte en espera de revisión
+  REVIEWED // Reporte revisado
+  RESOLVED // Se tomaron medidas para resolver el reporte
+  DISMISSED // Reporte desestimado
 }
 
 enum TypePublishJobAdvertisement {

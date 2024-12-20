@@ -20,9 +20,9 @@ export class CreateAdvertisementJobUseCase implements ICreateAdvertisementJobUse
 
     async execute(body: CreateJobAdvertisementDto): Promise<AdvertisementJob> {
         const [category, user, company] = await Promise.all([
-            this.categoryRepository.findById(body.categoryId),
+            this.categoryRepository.getById(body.categoryId),
             body.userId ? this.authRepository.findById(body.userId) : Promise.resolve(null),
-            body.companyId ? this.companyRepository.findById(body.companyId) : Promise.resolve(null),
+            body.companyId ? this.companyRepository.getById(body.companyId) : Promise.resolve(null),
         ]);
 
         if (!category) throw (`Category not found : ${body.categoryId}`);

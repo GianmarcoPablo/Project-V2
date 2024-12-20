@@ -10,6 +10,8 @@ import { AuthRepository } from "../../../domain/repositories/auth/auth.repositor
 import { GetAdvertisementJobByIdUseCase } from "../../../domain/use-cases/advertisement-job/get-advertisement-job-by-id.use-case";
 import { GetAllAdvertisementsJobUseCase } from "../../../domain/use-cases/advertisement-job/get-all-advertisements-job.use-case";
 import { UpdateAdvertisementJobUseCase } from "../../../domain/use-cases/advertisement-job/update-advertisement-job.use-case";
+import { zReportAdvertisementJobSchema } from "../../validators/advertisement-job/report-advertisement-job.validator";
+import { zSaveAdvertisementJobSchema } from "../../validators/advertisement-job/save-advertisement-job.validator";
 
 export class AdvertisementJobRoutes {
 
@@ -46,6 +48,14 @@ export class AdvertisementJobRoutes {
             const body = {}
             const data = await new UpdateAdvertisementJobUseCase(this.advertisementJobRepository).execute(id, body)
             return c.json(data)
+        })
+
+        router.post("/save", zSaveAdvertisementJobSchema, async (c) => {
+            const body = c.req.valid("json");
+        })
+
+        router.post("/report", zReportAdvertisementJobSchema, async (c) => {
+            const body = c.req.valid("json");
         })
 
         return router;
