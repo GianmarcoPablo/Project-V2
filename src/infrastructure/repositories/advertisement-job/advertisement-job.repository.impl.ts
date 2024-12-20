@@ -145,4 +145,8 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
             throw error; // Lanzar el error para que no se devuelva undefined
         }
     }
+
+    async delete(id: string): Promise<string> {
+        return `eliminando el aviso con el id ${id}`
+    }
 }

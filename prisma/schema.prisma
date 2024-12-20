@@ -48,7 +48,7 @@ model Company {
   name             String             @unique
   description      String
   logoUrl          String?
-  banerUrl         String?
+  bannerUrl         String?
   phone            String?
   address          String?
   industry         String

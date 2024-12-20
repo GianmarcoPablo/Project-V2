@@ -24,7 +24,7 @@ const createCompanySchema = z.object({
         .refine((file) => {
             return file && ACCEPTED_FILE_TYPES.includes(file.type);
         }, `File must be one of the following types: ${ACCEPTED_FILE_TYPES.join(", ")}`).optional(),
-    banerUrl: z.instanceof(File)
+    bannerUrl: z.instanceof(File)
         .refine((file) => {
             return !file || file.size <= MAX_UPLOAD_SIZE;
         }, 'File size must be less than 3MB')

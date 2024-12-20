@@ -8,6 +8,7 @@ import { zUpdateCompanySchema } from "../../validators/company/update-company.va
 import { zCreateCompanySchema } from "../../validators/company/create-company.validator";
 import { GetAllCompaniesUseCase } from "../../../domain/use-cases/company/get-all-companies.use-case";
 import { GetCompanyByIdUseCase } from "../../../domain/use-cases/company/get-company-by-id.use-case";
+import { DeleteCompanyUseCase } from "../../../domain/use-cases/company/delete-company.use-case";
 
 export class CompanyRoutes {
 
@@ -20,7 +21,9 @@ export class CompanyRoutes {
         const router = new Hono();
 
         router.get("/", async (c) => {
-            const data = await new GetAllCompaniesUseCase(this.companyRepository).execute({})
+            const limit = Number(c.req.query())
+            const page = Number(c.req.query())
+            const data = await new GetAllCompaniesUseCase(this.companyRepository).execute({ limit, page })
             return c.json(data)
         })
 
@@ -44,6 +47,14 @@ export class CompanyRoutes {
             const data = await new UpdateCompanyUseCase(this.companyRepository, this.storageService).execute(id, { ...body, userId: user!.id })
             return c.json(data)
         })
+
+        router.delete("/:id", AuthMiddleware.authenticate, async (c) => {
+            const user = c.req.user
+            const id = c.req.param("id");
+            const data = await new DeleteCompanyUseCase(this.companyRepository).execute(id, user!.id)
+            return c.json(data)
+        })
+
 
 
         return router;

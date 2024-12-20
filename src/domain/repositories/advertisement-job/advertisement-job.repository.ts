@@ -7,4 +7,5 @@ export abstract class AdvertisementJobRepository {
     abstract getAll(body: any): Promise<AdvertisementJob[]>
     abstract getById(id: string): Promise<AdvertisementJob | null>
     abstract update(id: string, body: UpdateJobAdvertisementDto): Promise<AdvertisementJob>
+    abstract delete(id: string): Promise<string>
 }

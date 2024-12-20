@@ -2,7 +2,7 @@ import { Company } from "../../entities/company/Company";
 import { CompanyRepository } from "../../repositories/company/company.repository";
 
 interface IGetAllCompaniesUseCase {
-    execute(body: any): Promise<Company[]>
+    execute(body: { page: number; limit: number; }): Promise<Company[]>
 }
 
 export class GetAllCompaniesUseCase implements IGetAllCompaniesUseCase {
@@ -11,7 +11,7 @@ export class GetAllCompaniesUseCase implements IGetAllCompaniesUseCase {
         private readonly companyRepository: CompanyRepository,
     ) { }
 
-    async execute(body: any): Promise<Company[]> {
+    async execute(body: { page: number; limit: number; }): Promise<Company[]> {
         const companies = await this.companyRepository.getAll(body)
         return companies
     }

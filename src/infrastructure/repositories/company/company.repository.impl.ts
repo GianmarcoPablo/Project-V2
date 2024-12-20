@@ -6,9 +6,12 @@ import { prisma } from "../../orm/prisma";
 
 export class CompanyRepositoryImpl implements CompanyRepository {
 
-    async getAll(body: any): Promise<Company[]> {
+    async getAll({ limit, page }: { page: number; limit: number; }): Promise<Company[]> {
         try {
-            const companies = await prisma.company.findMany()
+            const companies = await prisma.company.findMany({
+                skip: (page - 1) * limit,
+                take: limit,
+            })
             return companies.map(company =>
                 new Company(
                     company.id,
@@ -20,7 +23,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
                     company.updatedAt,
                     company.userId,
                     company.logoUrl ? company.logoUrl : undefined,
-                    company.banerUrl ? company.banerUrl : undefined,
+                    company.bannerUrl ? company.bannerUrl : undefined,
                     company.phone ? company.phone : undefined,
                     company.address ? company.address : undefined,
                     company.industry ? company.industry : undefined,
@@ -47,7 +50,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
                 company.updatedAt,
                 company.userId,
                 company.logoUrl ? company.logoUrl : undefined,
-                company.banerUrl ? company.banerUrl : undefined,
+                company.bannerUrl ? company.bannerUrl : undefined,
                 company.phone ? company.phone : undefined,
                 company.address ? company.address : undefined,
                 company.industry ? company.industry : undefined,
@@ -72,7 +75,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
                 company.updatedAt,
                 company.userId,
                 company.logoUrl ? company.logoUrl : undefined,
-                company.banerUrl ? company.banerUrl : undefined,
+                company.bannerUrl ? company.bannerUrl : undefined,
                 company.phone ? company.phone : undefined,
                 company.address ? company.address : undefined,
                 company.industry ? company.industry : undefined,
@@ -98,7 +101,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
                 company.updatedAt,
                 company.userId,
                 company.logoUrl ? company.logoUrl : undefined,
-                company.banerUrl ? company.banerUrl : undefined,
+                company.bannerUrl ? company.bannerUrl : undefined,
                 company.phone ? company.phone : undefined,
                 company.address ? company.address : undefined,
                 company.industry ? company.industry : undefined,
@@ -108,5 +111,9 @@ export class CompanyRepositoryImpl implements CompanyRepository {
             console.error("Error find company:", error);
             throw error; // Lanzar el error para que no se devuelva undefined
         }
+    }
+
+    async delete(id: string): Promise<string> {
+        return `eliminado la compañia con el id ${id}`
     }
 }
