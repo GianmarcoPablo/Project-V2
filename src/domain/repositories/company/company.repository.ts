@@ -8,4 +8,5 @@ export abstract class CompanyRepository {
     abstract getById(id: string): Promise<Company | null>
     abstract update(id: string, body: UpdateCompanyDto): Promise<Company>
     abstract delete(id: string): Promise<string>
+    abstract getCompaniesByUser(userId: string): Promise<Company[]>
 }

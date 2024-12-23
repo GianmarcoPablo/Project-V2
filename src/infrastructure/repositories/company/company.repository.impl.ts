@@ -32,7 +32,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
             );
         } catch (error) {
             console.error("Error get all companies:", error);
-            throw error; // Lanzar el error para que no se devuelva undefined
+            throw error; 
         }
     }
 
@@ -58,7 +58,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
             )
         } catch (error) {
             console.error("Error find company:", error);
-            throw error; // Lanzar el error para que no se devuelva undefined
+            throw error; 
         }
     }
 
@@ -83,7 +83,7 @@ export class CompanyRepositoryImpl implements CompanyRepository {
             )
         } catch (error) {
             console.error("Error created company:", error);
-            throw error; // Lanzar el error para que no se devuelva undefined
+            throw error; 
         }
     }
 
@@ -109,11 +109,38 @@ export class CompanyRepositoryImpl implements CompanyRepository {
             )
         } catch (error) {
             console.error("Error find company:", error);
-            throw error; // Lanzar el error para que no se devuelva undefined
+            throw error;
         }
     }
 
     async delete(id: string): Promise<string> {
         return `eliminado la compañia con el id ${id}`
+    }
+
+    async getCompaniesByUser(userId: string): Promise<Company[]> {
+        try {
+            const companies = await prisma.company.findMany({ where: { userId } })
+            return companies.map(company =>
+                new Company(
+                    company.id,
+                    company.name,
+                    company.description,
+                    company.isVerified,
+                    company.socialLinks,
+                    company.createdAt,
+                    company.updatedAt,
+                    company.userId,
+                    company.logoUrl ? company.logoUrl : undefined,
+                    company.bannerUrl ? company.bannerUrl : undefined,
+                    company.phone ? company.phone : undefined,
+                    company.address ? company.address : undefined,
+                    company.industry ? company.industry : undefined,
+                    company.website ? company.website : undefined
+                )
+            );
+        } catch (error) {
+            console.error("Error find company by user:", error);
+            throw error; 
+        }
     }
 }

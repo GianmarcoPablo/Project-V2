@@ -13,6 +13,7 @@ import { AdvertisementJobRoutes } from './presentation/routes/advertisement-job/
 import { AdvertisementJobRepositoryImpl } from './infrastructure/repositories/advertisement-job/advertisement-job.repository.impl';
 import { CategoryRepositoryImpl } from './infrastructure/repositories/category/category.repository.impl';
 import { CategoryRoutes } from './presentation/routes/category/category.routes';
+import { SeedRoutes } from './presentation/routes/seed/seed.routes';
 
 const app = new Hono()
 
@@ -54,6 +55,8 @@ app.route("/api/v1/advertisement", new AdvertisementJobRoutes(
 app.route("/api/v1/category", new CategoryRoutes(
   new CategoryRepositoryImpl()).routes
 )
+
+app.route("/api/v1/seed", new SeedRoutes().routes)
 
 // Routes - Not found
 app.notFound((c) => {

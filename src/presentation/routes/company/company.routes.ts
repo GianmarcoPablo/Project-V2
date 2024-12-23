@@ -9,6 +9,7 @@ import { zCreateCompanySchema } from "../../validators/company/create-company.va
 import { GetAllCompaniesUseCase } from "../../../domain/use-cases/company/get-all-companies.use-case";
 import { GetCompanyByIdUseCase } from "../../../domain/use-cases/company/get-company-by-id.use-case";
 import { DeleteCompanyUseCase } from "../../../domain/use-cases/company/delete-company.use-case";
+import { GetCompaniesByUserUseCase } from "../../../domain/use-cases/company/get-companies-by-user.use-case";
 
 export class CompanyRoutes {
 
@@ -55,11 +56,16 @@ export class CompanyRoutes {
             return c.json(data)
         })
 
-
+        router.get("/by/owned", AuthMiddleware.authenticate, async (c) => {
+            const user = c.req.user
+            const data = await new GetCompaniesByUserUseCase(this.companyRepository).execute(user!.id)
+            return c.json(data)
+        })
 
         return router;
     }
 }
+
 
 
 

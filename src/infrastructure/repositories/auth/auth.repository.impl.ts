@@ -2,6 +2,7 @@ import { User } from "../../../domain/entities/auth/User";
 import { RegisterUserDto } from "../../../domain/dtos/auth/register-user.dto";
 import { AuthRepository } from "../../../domain/repositories/auth/auth.repository";
 import { prisma } from "../../orm/prisma";
+import { UpdatedUserDto } from "../../../domain/dtos/auth/updated-user.dto";
 
 export class AuthReposioryImpl implements AuthRepository {
 
@@ -46,6 +47,16 @@ export class AuthReposioryImpl implements AuthRepository {
             return new User(user.id, user.email, user.name, user.password, user.roles)
         } catch (error) {
             console.error("User not found:", error);
+            throw error; // Lanzar el error para que no se devuelva undefined
+        }
+    }
+
+    async updated(userId: string, body: UpdatedUserDto): Promise<string> {
+        try {
+            await prisma.user.update({ where: { id: userId }, data: body })
+            return "Se actualizo correctamente"
+        } catch (error) {
+            console.error("User updated error:", error);
             throw error; // Lanzar el error para que no se devuelva undefined
         }
     }

@@ -9,6 +9,7 @@
     "cloudinary": "^2.5.1",
     "dotenv": "^16.4.7",
     "hono": "^4.6.12",
+    "stripe": "^17.5.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -20,7 +20,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
     async execute(body: LoginUserDto): Promise<string> {
 
         const user = await this.authRepository.findByEmail(body.email);
-        if (!user) throw new Error('Invalid credentials');
+        if (!user) throw new Error('Not found user');
         const isPasswordValid = await this.passwordService.compare(body.password, user.password)
         if (!isPasswordValid) throw new Error('Invalid credentials');
         return this.tokenService.generateToken({ id: user.id })

@@ -26,17 +26,43 @@ enum Status {
   CLOSED
 }
 
+enum Plan {
+  free
+  premium
+}
+
+enum SubscriptionPeriod {
+  monthly
+  yearly
+}
+
 model User {
   id                     String                   @id @default(uuid())
   name                   String
   password               String
   email                  String                   @unique
   roles                  String[]
+  customerId             String?                  @unique
+  plan                   Plan                     @default(free)
   jobAdvertisement       JobAdvertisement[]
   Application            Application[]
   Company                Company[]
   SavedAdvertisementJob  SavedAdvertisementJob[]
   ReportAdvertisementJob ReportAdvertisementJob[]
+  Subscription           Subscription?
+}
+
+model Subscription {
+  id        String             @id @default(uuid()) @map("_id")
+  userId    String             @unique
+  plan      Plan
+  period    SubscriptionPeriod
+  startDate DateTime           @default(now())
+  endDate   DateTime
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
 }
 
 model Company {
