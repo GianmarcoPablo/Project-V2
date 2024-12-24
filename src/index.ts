@@ -14,6 +14,8 @@ import { AdvertisementJobRepositoryImpl } from './infrastructure/repositories/ad
 import { CategoryRepositoryImpl } from './infrastructure/repositories/category/category.repository.impl';
 import { CategoryRoutes } from './presentation/routes/category/category.routes';
 import { SeedRoutes } from './presentation/routes/seed/seed.routes';
+import { SubscriptionsRoutes } from './presentation/routes/subscriptions/subscriptions.routes';
+import { SubscriptionsService } from './infrastructure/providers/subscriptions/subscriptions.service';
 
 const app = new Hono()
 
@@ -42,6 +44,10 @@ app.route("/api/v1/auth", new AuthRoutes(
   new HashPasswordService(),
   new TokenService()).routes
 )
+
+app.route("/api/v1/subscriptions", new SubscriptionsRoutes(
+  new SubscriptionsService()
+).routes)
 app.route("/api/v1/company", new CompanyRoutes(
   new CompanyRepositoryImpl(),
   new StorageService()).routes
