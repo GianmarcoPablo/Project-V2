@@ -1,6 +1,7 @@
 import { Context, Next } from "hono";
 import { decode } from "hono/jwt";
 import { prisma } from "../../../infrastructure/orm/prisma";
+import { Plan } from "@prisma/client";
 
 declare module "hono" {
     interface HonoRequest {
@@ -8,6 +9,10 @@ declare module "hono" {
             id: string;
             name: string;
             email: string;
+            password: string;
+            roles: string[];
+            customerId: string | null;
+            plan: Plan
         };
     }
 }
@@ -20,7 +25,6 @@ export class AuthMiddleware {
             const bearer = c.req.header("Authorization")
             if (!bearer) return c.json({ msg: "Unauthorized" }, 401)
             const [, token] = bearer.split(" ")
-            console.log(token)
             if (!token) return c.json({ msg: "Unauthorized" }, 401)
             const { header, payload } = decode(token)
             if (!payload.id) return c.json({ msg: "Unauthorized" }, 401)

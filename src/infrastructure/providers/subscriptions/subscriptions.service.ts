@@ -1,3 +1,4 @@
+import { User } from "@prisma/client";
 import { stripe } from "../../../config/stripe";
 
 export class SubscriptionsService {
@@ -35,5 +36,28 @@ export class SubscriptionsService {
                     ? product.default_price
                     : product.default_price?.id,
         }));
+    }
+
+    public async createCheckoutSession(user: User, priceId: string) {
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [
+                {
+                    price: priceId,
+                    quantity: 1,
+                },
+            ],
+            mode: 'subscription',
+            success_url: `http://localhost:3001/pricing/sucess?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `http://localhost:3001/pricing`,
+            customer: user.customerId || undefined,
+            client_reference_id: user.id,
+            allow_promotion_codes: true,
+            subscription_data: {
+                trial_period_days: 14,
+            },
+        });
+
+        return session.url
     }
 }
