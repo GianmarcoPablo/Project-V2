@@ -1,19 +1,11 @@
 import { Context, Next } from "hono";
 import { decode } from "hono/jwt";
 import { prisma } from "../../../infrastructure/orm/prisma";
-import { Plan } from "@prisma/client";
+import { User } from "@prisma/client";
 
 declare module "hono" {
     interface HonoRequest {
-        user?: {
-            id: string;
-            name: string;
-            email: string;
-            password: string;
-            roles: string[];
-            customerId: string | null;
-            plan: Plan
-        };
+        user?: User
     }
 }
 

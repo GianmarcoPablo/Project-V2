@@ -22,14 +22,6 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
         if (existingUser) throw new Error("User already exits")
         body.password = await this.passwordService.hash(body.password);
         const newUser = await this.userRepository.registerUser(body)
-
-        const customer = await stripe.customers.create({
-            email: newUser.email,
-            metadata: { userId: newUser.id }
-        });
-
-        await this.userRepository.updated(newUser.id, { customerId: customer.id })
-
         return await this.tokenService.generateToken({ id: newUser.id })
     }
 
