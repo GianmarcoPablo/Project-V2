@@ -12,6 +12,8 @@ import { GetAllAdvertisementsJobUseCase } from "../../../domain/use-cases/advert
 import { UpdateAdvertisementJobUseCase } from "../../../domain/use-cases/advertisement-job/update-advertisement-job.use-case";
 import { zReportAdvertisementJobSchema } from "../../validators/advertisement-job/report-advertisement-job.validator";
 import { zSaveAdvertisementJobSchema } from "../../validators/advertisement-job/save-advertisement-job.validator";
+import { SaveAdvertisementJobUseCase } from "../../../domain/use-cases/advertisement-job/save-advertisement-job.use-case";
+import { prisma } from "../../../infrastructure/orm/prisma";
 
 export class AdvertisementJobRoutes {
 
@@ -50,8 +52,32 @@ export class AdvertisementJobRoutes {
             return c.json(data)
         })
 
-        router.post("/save", zSaveAdvertisementJobSchema, async (c) => {
+        router.post("/save/advertisement", AuthMiddleware.authenticate, zSaveAdvertisementJobSchema, async (c) => {
+            const user = c.req.user
             const body = c.req.valid("json");
+            console.log(user, body)
+            const data = await new SaveAdvertisementJobUseCase(this.advertisementJobRepository).execute({ jobId: body.jobId, userId: user!.id })
+            return c.json(data)
+        })
+
+        router.get("/save-job/:jobId", AuthMiddleware.authenticate, async (c) => {
+            try {
+                const { jobId } = c.req.param();
+                const user = c.req.user
+                const savedJob = await prisma.savedAdvertisementJob.findUnique({
+                    where: {
+                        userId_jobId: {
+                            userId: user!.id,
+                            jobId: jobId
+                        },
+                    },
+                });
+
+                return c.json({ isSaved: !!savedJob });
+
+            } catch (error) {
+                return c.json({ error: 'Error checking saved job status' });
+            }
         })
 
         router.post("/report", zReportAdvertisementJobSchema, async (c) => {

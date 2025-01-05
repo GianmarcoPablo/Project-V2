@@ -1,4 +1,3 @@
-import { $Enums } from "@prisma/client";
 
 
 export class AdvertisementJob {
@@ -7,14 +6,14 @@ export class AdvertisementJob {
         public title: string,
         public description: string,
         public experienceLevel: string,
-        public jobType: $Enums.JobType,
-        public workMode: $Enums.WorkMode,
-        public publishType: $Enums.TypePublishJobAdvertisement,
+        public jobType: string,
+        public workMode: string,
+        public publishType: string,
         public applicationLinks: string[],
         public requirements: string[],
         public benefits: string[],
         public languagesRequired: string[],
-        public status: $Enums.Status,
+        public status: string,
         public vacancies: number,
         public createdAt: Date,
         public updatedAt: Date,
@@ -26,5 +25,7 @@ export class AdvertisementJob {
         public additionalInformation?: string,
         public userId?: string,
         public companyId?: string,
+        public user?: { name: string },
+        public company?: { name: string, logoUrl?: string, isVerified: boolean },
     ) { }
 }

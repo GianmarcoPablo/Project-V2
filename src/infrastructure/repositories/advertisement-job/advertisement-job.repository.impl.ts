@@ -1,6 +1,8 @@
 import { CreateJobAdvertisementDto } from "../../../domain/dtos/advertisement-job/create-advertisement-job.dto";
+import { SaveAdvertisementJobDto } from "../../../domain/dtos/advertisement-job/save-advertisement-job.dto";
 import { UpdateJobAdvertisementDto } from "../../../domain/dtos/advertisement-job/update-advertisement.dto";
 import { AdvertisementJob } from "../../../domain/entities/advertisement-job/Advertisement-job.entity";
+import { SaveAdvertisementJob } from "../../../domain/entities/advertisement-job/SaveAdvertisementJob.entity";
 import { AdvertisementJobRepository } from "../../../domain/repositories/advertisement-job/advertisement-job.repository";
 import { prisma } from "../../orm/prisma";
 
@@ -43,7 +45,22 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
 
     async getAll(body: any): Promise<AdvertisementJob[]> {
         try {
-            const advertisementsJob = await prisma.jobAdvertisement.findMany()
+            const advertisementsJob = await prisma.jobAdvertisement.findMany({
+                include: {
+                    Company: {
+                        select: {
+                            name: true,
+                            logoUrl: true,
+                            isVerified: true,
+                        }
+                    },
+                    User: {
+                        select: {
+                            name: true,
+                        }
+                    }
+                }
+            })
             return advertisementsJob.map(advertisementJob =>
                 new AdvertisementJob(
                     advertisementJob.id,
@@ -62,15 +79,22 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
                     advertisementJob.createdAt,
                     advertisementJob.updatedAt,
                     advertisementJob.categoryId,
-                    advertisementJob.applicationDeadline ? advertisementJob.applicationDeadline : undefined,
-                    advertisementJob.salay ? advertisementJob.salay : undefined,
-                    advertisementJob.location ? advertisementJob.location : undefined,
-                    advertisementJob.workHours ? advertisementJob.workHours : undefined,
-                    advertisementJob.additionalInformation ? advertisementJob.additionalInformation : undefined,
-                    advertisementJob.userId ? advertisementJob.userId : undefined,
-                    advertisementJob.companyId ? advertisementJob.companyId : undefined,
+                    advertisementJob.applicationDeadline ?? undefined,
+                    advertisementJob.salay ?? undefined,
+                    advertisementJob.location ?? undefined,
+                    advertisementJob.workHours ?? undefined,
+                    advertisementJob.additionalInformation ?? undefined,
+                    advertisementJob.userId ?? undefined,
+                    advertisementJob.companyId ?? undefined,
+                    advertisementJob.User ? { name: advertisementJob.User.name } : undefined,
+                    advertisementJob.Company ? {
+                        name: advertisementJob.Company.name,
+                        logoUrl: advertisementJob.Company.logoUrl ? advertisementJob.Company.logoUrl : undefined,
+                        isVerified: advertisementJob.Company.isVerified
+                    } : undefined
                 )
-            )
+            );
+
         } catch (error) {
             console.error("Error get all advertismenet:", error);
             throw error; // Lanzar el error para que no se devuelva undefined
@@ -148,5 +172,35 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
 
     async delete(id: string): Promise<string> {
         return `eliminando el aviso con el id ${id}`
+    }
+
+    async save(body: SaveAdvertisementJobDto): Promise<any> {
+        try {
+            const userId = body.userId
+            const jobId = body.jobId
+            const existingSavedJob = await prisma.savedAdvertisementJob.findUnique({
+                where: {
+                    userId_jobId: { userId, jobId }
+                },
+            });
+
+            if (existingSavedJob) {
+                // Eliminar si ya está guardado
+                await prisma.savedAdvertisementJob.delete({
+                    where: {
+                        userId_jobId: { userId, jobId },
+                    },
+                });
+                return { isSaved: false }
+            } else {
+                // Guardar si no está guardado
+                await prisma.savedAdvertisementJob.create({
+                    data: { userId, jobId },
+                });
+                return { isSaved: true }
+            }
+        } catch (error) {
+            throw error
+        }
     }
 }
