@@ -43,9 +43,11 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
         }
     }
 
-    async getAll(body: any): Promise<AdvertisementJob[]> {
+    async getAll(body: PaginationJobsDto): Promise<{ currentPage: number; totalPages: number; advertisementsJobs: AdvertisementJob[] }> {
         try {
             const advertisementsJob = await prisma.jobAdvertisement.findMany({
+                take: body.take,
+                skip: (body.page - 1) * body.take,
                 include: {
                     Company: {
                         select: {
@@ -60,8 +62,13 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
                         }
                     }
                 }
-            })
-            return advertisementsJob.map(advertisementJob =>
+            });
+
+            const totalCount = await prisma.jobAdvertisement.count();
+            const totalPages = Math.ceil(totalCount / body.take);
+            const currentPage = body.page;
+
+            const mappedAdvertisements = advertisementsJob.map(advertisementJob =>
                 new AdvertisementJob(
                     advertisementJob.id,
                     advertisementJob.title,
@@ -95,11 +102,18 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
                 )
             );
 
+            return {
+                currentPage,
+                totalPages,
+                advertisementsJobs: mappedAdvertisements
+            };
+
         } catch (error) {
-            console.error("Error get all advertismenet:", error);
+            console.error("Error get all advertisement:", error);
             throw error; // Lanzar el error para que no se devuelva undefined
         }
     }
+
 
     async getById(id: string): Promise<AdvertisementJob | null> {
         try {
@@ -175,32 +189,37 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
     }
 
     async save(body: SaveAdvertisementJobDto): Promise<any> {
-        try {
-            const userId = body.userId
-            const jobId = body.jobId
-            const existingSavedJob = await prisma.savedAdvertisementJob.findUnique({
-                where: {
-                    userId_jobId: { userId, jobId }
-                },
-            });
+        const { userId, jobId } = body;
 
-            if (existingSavedJob) {
-                // Eliminar si ya está guardado
-                await prisma.savedAdvertisementJob.delete({
+        try {
+            const result = await prisma.$transaction(async (prisma) => {
+                const existingSavedJob = await prisma.savedAdvertisementJob.findUnique({
                     where: {
                         userId_jobId: { userId, jobId },
                     },
                 });
-                return { isSaved: false }
-            } else {
-                // Guardar si no está guardado
-                await prisma.savedAdvertisementJob.create({
-                    data: { userId, jobId },
-                });
-                return { isSaved: true }
-            }
+
+                if (existingSavedJob) {
+                    // Eliminar si ya está guardado
+                    await prisma.savedAdvertisementJob.delete({
+                        where: {
+                            userId_jobId: { userId, jobId },
+                        },
+                    });
+                    return { isSaved: false };
+                } else {
+                    // Guardar si no está guardado
+                    await prisma.savedAdvertisementJob.create({
+                        data: { userId, jobId },
+                    });
+                    return { isSaved: true };
+                }
+            });
+
+            return result;
         } catch (error) {
-            throw error
+            console.error("Error en save:", error);
+            throw error;
         }
     }
 }

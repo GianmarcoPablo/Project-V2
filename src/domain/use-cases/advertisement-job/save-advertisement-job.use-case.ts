@@ -12,9 +12,7 @@ export class SaveAdvertisementJobUseCase implements ISaveAdvertisementJobUseCase
     ) { }
 
     async execute(body: SaveAdvertisementJobDto): Promise<any> {
-        console.log(body)
         const data = await this.repository.save(body)
-        console.log(data)
         return data
     }
 

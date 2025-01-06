@@ -34,8 +34,10 @@ export class AdvertisementJobRoutes {
         });
 
         router.get("/", async (c) => {
-            const body = {}
-            const data = await new GetAllAdvertisementsJobUseCase(this.advertisementJobRepository).execute(body)
+            let { page = 1, take = 3 } = c.req.query()
+            if (isNaN(Number(page))) page = 1;
+            if (Number(page) < 1) page = 1;
+            const data = await new GetAllAdvertisementsJobUseCase(this.advertisementJobRepository).execute({ page: +page, take: +take })
             return c.json(data)
         })
 
@@ -52,10 +54,9 @@ export class AdvertisementJobRoutes {
             return c.json(data)
         })
 
-        router.post("/save/advertisement", AuthMiddleware.authenticate, zSaveAdvertisementJobSchema, async (c) => {
+        router.post("/save", AuthMiddleware.authenticate, zSaveAdvertisementJobSchema, async (c) => {
             const user = c.req.user
             const body = c.req.valid("json");
-            console.log(user, body)
             const data = await new SaveAdvertisementJobUseCase(this.advertisementJobRepository).execute({ jobId: body.jobId, userId: user!.id })
             return c.json(data)
         })
