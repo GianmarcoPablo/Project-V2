@@ -1,10 +1,4 @@
-enum ApplicationStatus {
-    PENDING, // Postulación recibida pero no revisada
-    REVIEWED, // Postulación revisada
-    SHORTLISTED, // Seleccionado para la siguiente etapa
-    REJECTED, // Postulación rechazada
-    ACCEPTED, // Aprobado para el puesto
-}
+type ApplicationStatus = "PENDING" | "REVIEWED" | "SHORTLISTED" | "REJECTED" | "ACCEPTED"
 
 export class UserApplicationJob {
     constructor(

@@ -43,7 +43,7 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
         }
     }
 
-    async getAll(body: PaginationJobsDto): Promise<{ currentPage: number; totalPages: number; advertisementsJobs: AdvertisementJob[] }> {
+    async getAll(body: PaginationJobsDto): Promise<{ currentPage: number; totalPages: number; totalJobs: number; advertisementsJobs: AdvertisementJob[] }> {
         try {
             const advertisementsJob = await prisma.jobAdvertisement.findMany({
                 take: body.take,
@@ -64,8 +64,9 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
                 }
             });
 
-            const totalCount = await prisma.jobAdvertisement.count();
-            const totalPages = Math.ceil(totalCount / body.take);
+            const totalJobs = await prisma.jobAdvertisement.count();
+            const totalPages = Math.ceil(totalJobs / body.take);
+            console.log({ totalPages })
             const currentPage = body.page;
 
             const mappedAdvertisements = advertisementsJob.map(advertisementJob =>
@@ -105,6 +106,7 @@ export class AdvertisementJobRepositoryImpl implements AdvertisementJobRepositor
             return {
                 currentPage,
                 totalPages,
+                totalJobs,
                 advertisementsJobs: mappedAdvertisements
             };
 

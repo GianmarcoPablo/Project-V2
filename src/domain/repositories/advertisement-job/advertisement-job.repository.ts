@@ -6,7 +6,7 @@ import { SaveAdvertisementJob } from "../../entities/advertisement-job/SaveAdver
 
 export abstract class AdvertisementJobRepository {
     abstract create(body: CreateJobAdvertisementDto): Promise<AdvertisementJob>
-    abstract getAll(body: any): Promise<{ currentPage: number; totalPages: number; advertisementsJobs: AdvertisementJob[] }>
+    abstract getAll(body: any): Promise<{ currentPage: number; totalPages: number; totalJobs: number; advertisementsJobs: AdvertisementJob[] }>
     abstract getById(id: string): Promise<AdvertisementJob | null>
     abstract update(id: string, body: UpdateJobAdvertisementDto): Promise<AdvertisementJob>
     abstract delete(id: string): Promise<string>
