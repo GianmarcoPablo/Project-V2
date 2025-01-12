@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import { zRegisterUserValidator } from "../../validators/auth/register-user.validator";
 import { zLoginUserSchema } from "../../validators/auth/login-user.validator";
 import { RegisterUserUseCase } from "../../../domain/use-cases/auth/register-user.use-case";
@@ -7,6 +7,7 @@ import { IHashPasswordService } from "../../../domain/providers-interfaces/auth/
 import { ITokenService } from "../../../domain/providers-interfaces/auth/token.service.interface";
 import { LoginUserUseCase } from "../../../domain/use-cases/auth/login-user.use-case";
 import { AuthMiddleware } from "../../middlewares/auth/auth.middleware";
+import { AppError } from "../../../domain/errors/custom-error";
 
 
 export class AuthRoutes {
@@ -21,23 +22,25 @@ export class AuthRoutes {
         const router = new Hono();
 
         router.post("/register", zRegisterUserValidator, async (c) => {
-            const body = c.req.valid("json");
-            const data = await new RegisterUserUseCase(this.authRepository, this.passwordService, this.tokenService).execute(body);
-            return c.json(data);
+            try {
+                const body = c.req.valid("json");
+                const data = await new RegisterUserUseCase(this.authRepository, this.passwordService, this.tokenService).execute(body);
+                return c.json(data);
+            } catch (error) {
+                return AuthRoutes.handleError(error, c)
+            }
         });
 
-        router.post("/login", zLoginUserSchema, async (c) => {
-            const body = c.req.valid("form");
-            const data = await new LoginUserUseCase(this.authRepository, this.passwordService, this.tokenService).execute(body)
-            return c.json(data);
-        });
 
-        router.get("/user", AuthMiddleware.authenticate, async (c) => {
-            const user = c.req.user
-            return c.json(user)
-        })
 
         return router;
+    }
+
+    private static handleError(error: any, c: Context) {
+        if (error instanceof AppError) {
+            return c.json({ msg: error.message }, error.statusCode)
+        }
+        return c.json({ msg: "Internal server error" }, 500)
     }
 }
 

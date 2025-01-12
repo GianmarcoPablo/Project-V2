@@ -35,7 +35,8 @@ export class AuthReposioryImpl implements AuthRepository {
             return new User(user.id, user.email, user.name, user.password, user.roles)
         } catch (error) {
             console.error("Error registering user:", error);
-            throw error; // Lanzar el error para que no se devuelva undefined
+            // Lanzar un error específico que sea manejable en capas superiores
+            throw new Error("Failed to register user. Please try again later.");
         }
     }
 
